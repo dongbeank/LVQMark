@@ -1,0 +1,79 @@
+# SDformer (VQ-VAE + AR Transformer) — stocks.
+#
+# Adapted from https://github.com/soizhiwen/TimeWak
+#
+# seq_length / window are overridden by --window_size on the command line (24 here,
+# 64 for every run this repo records).
+
+vqvae:
+  target: Models.sdformer.vqvae.VQVAE
+  params:
+    seq_length: 24
+    feature_size: 6
+    hidden_dim: 512
+    codebook_size: 512
+    codebook_dim: 256
+    downsample_rate: 4
+    n_resblocks: 2
+    ema_decay: 0.99
+    embed_loss_weight: 2.0
+    reset_threshold: 100
+    quantizer_type: cosine       # 'cosine' or 'l2'
+
+transformer:
+  target: Models.sdformer.transformer_ar_vqvae.AutoregressiveTransformer
+  params:
+    codebook_size: 512
+    token_length: 6
+    n_embd: 1024
+    n_head: 8
+    n_layer: 2
+    attn_pdrop: 0.1
+    resid_pdrop: 0.1
+    mlp_hidden_times: 4
+    random_replace_prob: 0.3
+
+solver:
+  stage1:
+    base_lr: 3.0e-4
+    max_epochs: 50000
+    gradient_accumulate_every: 1
+    save_cycle: 5000
+
+  stage2:
+    base_lr: 3.0e-4
+    max_epochs: 50000
+    gradient_accumulate_every: 1
+    save_cycle: 5000
+
+  sampling:
+    temperature: 1.0
+    top_k: null
+
+dataloader:
+  train_dataset:
+    target: Utils.Data_utils.real_datasets.CustomDataset
+    params:
+      name: stock
+      proportion: 0.8
+      data_root: ./Data/datasets/stock_data.csv
+      window: 24
+      save2npy: True
+      neg_one_to_one: True
+      seed: 123
+      period: train
+
+  test_dataset:
+    target: Utils.Data_utils.real_datasets.CustomDataset
+    params:
+      name: stock
+      proportion: 0.8
+      data_root: ./Data/datasets/stock_data.csv
+      window: 24
+      save2npy: True
+      neg_one_to_one: True
+      seed: 123
+      period: test
+
+  batch_size: 128
+  shuffle: True

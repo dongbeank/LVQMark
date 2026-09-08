@@ -1,0 +1,27 @@
+# Tested with Python 3.10 and CUDA 12.8.
+# Every module imported anywhere under train*.py / generate*.py / evaluate*.py / Models /
+# Utils / Data / tests is covered by exactly one pin below. The single exception is `mkl`
+# (Models/ts2vec/utils.py), which sits inside a bare try/except and is optional.
+
+# Core
+torch>=2.0            # a build matching your CUDA version; tested with 2.10.0+cu128
+numpy==1.23.5
+scipy==1.13.1
+scikit-learn==1.5.0
+pandas==2.2.2
+PyYAML==6.0.1
+einops==0.8.0
+tqdm==4.66.4
+
+# Diffusion-TS baseline (Models/interpretable_diffusion/solver.py)
+ema-pytorch==0.4.8
+
+# Metrics: discriminative / predictive scores in evaluate.py
+tensorflow==2.12.0
+
+# Plotting (t-SNE / PCA visualisations in Utils/metric_utils.py)
+matplotlib==3.9.0
+seaborn==0.13.2
+
+# Tests (tests/ — CPU-only, `python -m pytest tests/ -q`)
+pytest==9.1.1

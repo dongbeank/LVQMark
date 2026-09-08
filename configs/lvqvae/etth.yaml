@@ -1,0 +1,61 @@
+vqvae:
+  target: Models.local_vqvae.LocalVQVAE
+  params:
+    feature_size: 7
+    seq_length: 64
+    d_model: 512
+    n_heads: 8
+    enc_layers: 5
+    local_dec_layers: 5
+    global_dec_layers: 5
+    rf: 4
+    codebook_size: 512
+    codebook_dim: 512
+    commitment_weight: 0.25
+    dropout: 0.0
+
+transformer:
+  target: Models.transformer_ar.AutoregressiveTransformer
+  params:
+    codebook_size: 512
+    n_embd: 1024
+    n_head: 8
+    n_layer: 2
+    attn_pdrop: 0.1
+    resid_pdrop: 0.1
+    mlp_hidden_times: 4
+    random_replace_prob: 0.1
+    lookback: 6
+
+# Robust encoder (stage-4). Used for attack-resilient token re-encoding at
+# detection time.
+robust_encoder:
+  d_model: 1024
+  n_layers: 3
+  n_heads: 16
+
+dataloader:
+  train_dataset:
+    target: Utils.Data_utils.real_datasets.CustomDataset
+    params:
+      name: etth
+      proportion: 0.8
+      data_root: ./Data/datasets/ETTh.csv
+      window: 64
+      save2npy: True
+      neg_one_to_one: True
+      seed: 123
+      period: train
+  test_dataset:
+    target: Utils.Data_utils.real_datasets.CustomDataset
+    params:
+      name: etth
+      proportion: 0.8
+      data_root: ./Data/datasets/ETTh.csv
+      window: 64
+      save2npy: True
+      neg_one_to_one: True
+      seed: 123
+      period: test
+  batch_size: 128
+  shuffle: True
