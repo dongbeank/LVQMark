@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LVQMark: A Locally Tokenized Generative Model for Robust Time-Series Watermarking</title>
+  <meta name="description" content="L-VQVAE and LVQMark (NeurIPS 2026): a locally tokenized generative model and a red-green logit-bias watermark with robust re-encoding for reliable time-series watermark detection under post-editing attacks.">
+  <meta property="og:title" content="LVQMark: Robust Time-Series Watermarking over Local VQ Tokens">
+  <meta property="og:description" content="A Locally Tokenized Generative Model for Robust Time-Series Watermarking (NeurIPS 2026)">
+  <meta property="og:image" content="static/images/framework.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Castoro&family=Noto+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --text: #363636;
+      --muted: #6e7684;
+      --accent: #2456d6;
+      --band: #f6f7fa;
+      --border: #e4e7ee;
+      --pill: #2b2f36;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: #fff;
+      line-height: 1.7;
+      font-size: 16.5px;
+    }
+    .container { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
+    .narrow { max-width: 760px; }
+
+    /* ---------- Hero ---------- */
+    .hero { padding: 4rem 0 2.2rem; text-align: center; }
+    .publication-title {
+      font-family: "Castoro", Georgia, "Times New Roman", serif;
+      font-weight: 400;
+      font-size: clamp(1.9rem, 4.5vw, 2.9rem);
+      line-height: 1.22;
+      text-wrap: balance;
+      margin-bottom: 1.3rem;
+    }
+    .venue { color: var(--accent); font-weight: 700; font-size: 1.15rem; margin-bottom: 1.4rem; }
+    .authors { font-size: 1.12rem; margin-bottom: 0.25rem; }
+    .authors a { color: var(--accent); text-decoration: none; }
+    .authors a:hover { text-decoration: underline; }
+    .authors sup { font-size: 0.72em; }
+    .affil { color: var(--muted); font-size: 1rem; margin-bottom: 0.2rem; }
+    .affil-note { color: var(--muted); font-size: 0.86rem; margin-bottom: 1.6rem; }
+    .links { display: flex; flex-wrap: wrap; gap: 0.65rem; justify-content: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--pill); color: #fff; text-decoration: none;
+      padding: 0.55rem 1.25rem; border-radius: 999px;
+      font-size: 0.95rem; font-weight: 600;
+      transition: background .15s ease;
+    }
+    .btn:hover { background: var(--accent); }
+    .btn svg { width: 1.05em; height: 1.05em; fill: currentColor; flex: none; }
+
+    /* ---------- Teaser ---------- */
+    .teaser { padding: 0.5rem 0 2.6rem; text-align: center; }
+    .teaser img { max-width: 100%; height: auto; }
+    .tagline {
+      max-width: 820px; margin: 1.4rem auto 0;
+      font-size: 1.1rem; font-weight: 600; text-wrap: balance;
+    }
+    .tagline .m { color: var(--accent); }
+
+    /* ---------- Sections ---------- */
+    section { padding: 3rem 0; }
+    section.band { background: var(--band); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    section + section.band, section.band + section { border-top: none; }
+    h2 {
+      font-family: "Castoro", Georgia, serif;
+      font-weight: 400; font-size: 1.75rem;
+      text-align: center; margin-bottom: 1.5rem; text-wrap: balance;
+    }
+    .prose p { text-align: justify; margin-bottom: 1rem; }
+    .prose p:last-child { margin-bottom: 0; }
+
+    .figure { text-align: center; margin: 1.6rem 0 0; }
+    .figure img { max-width: 100%; height: auto; }
+    .caption {
+      max-width: 820px; margin: 0.9rem auto 0;
+      font-size: 0.92rem; color: var(--muted); text-align: left; line-height: 1.6;
+    }
+    .caption b { color: var(--text); }
+
+    .highlight-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; margin-top: 1.8rem; }
+    .card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 1.15rem 1.25rem; text-align: left; }
+    section:not(.band) .card { background: var(--band); }
+    .card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .card p { font-size: 0.92rem; color: var(--muted); }
+    .card code, .prose code { font-size: 0.88em; background: rgba(36,86,214,0.08); padding: 0.08em 0.35em; border-radius: 4px; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; align-items: center; margin-top: 1.6rem; }
+    .two-col .figure { margin: 0; }
+    .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; align-items: start; margin-top: 1.6rem; }
+    .three-col .figure { margin: 0; }
+    .three-col .figure img { max-height: 520px; }
+    .sub { font-size: 0.9rem; font-weight: 600; margin-top: 0.4rem; }
+    .four-col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; align-items: start; margin-top: 1.6rem; }
+    .four-col .figure { margin: 0; }
+    @media (max-width: 640px) {
+      .two-col { grid-template-columns: 1fr; }
+      .four-col { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ---------- BibTeX ---------- */
+    .bibtex-wrap { position: relative; margin-top: 0.4rem; }
+    pre.bibtex {
+      background: var(--band); border: 1px solid var(--border); border-radius: 10px;
+      padding: 1.2rem 1.4rem; font-size: 0.87rem; overflow-x: auto; text-align: left;
+      font-family: "SFMono-Regular", Consolas, Menlo, monospace; line-height: 1.55;
+    }
+    .copy-btn {
+      position: absolute; top: 0.65rem; right: 0.65rem;
+      background: #fff; border: 1px solid var(--border); border-radius: 6px;
+      font: 600 0.8rem/1 "Noto Sans", sans-serif; color: var(--muted);
+      padding: 0.4rem 0.7rem; cursor: pointer;
+    }
+    .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+    footer { padding: 2.6rem 0; text-align: center; color: var(--muted); font-size: 0.88rem; }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  </style>
+</head>
+<body>
+
+  <header class="hero container">
+    <h1 class="publication-title">A Locally Tokenized Generative Model for Robust Time-Series Watermarking</h1>
+    <p class="venue">NeurIPS 2026</p>
+    <p class="authors">
+      Dongbin Kim<sup>1&dagger;</sup>, &nbsp;
+      Geonwoo Shin<sup>1&dagger;</sup>, &nbsp;
+      Yujin Choi<sup>1,2</sup>, &nbsp;
+      Soyeon Park<sup>1</sup>, &nbsp;
+      Jaewook Lee<sup>1*</sup>
+    </p>
+    <p class="affil"><sup>1</sup>Seoul National University &nbsp;&nbsp; <sup>2</sup>Nanyang Technological University</p>
+    <p class="affil-note"><sup>&dagger;</sup>Equal contribution &nbsp;&nbsp; <sup>*</sup>Corresponding author</p>
+    <div class="links">
+      <!-- TODO: add Paper (OpenReview) / arXiv buttons once the links exist -->
+      <a class="btn" href="https://github.com/dongbeank/LVQMark">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        Code
+      </a>
+    </div>
+  </header>
+
+  <div class="teaser container">
+    <img src="static/images/framework.png" alt="Overview of L-VQVAE and LVQMark">
+    <p class="tagline"><span class="m">L-VQVAE</span> recovers every discrete token from a short local window,
+    and <span class="m">LVQMark</span> watermarks that token stream with a scheduled logit bias and detects it with a
+    robust re-encoder &mdash; so a post-editing attack can only touch a bounded set of tokens.</p>
+  </div>
+
+  <section class="band">
+    <div class="container narrow prose">
+      <h2>Abstract</h2>
+      <p>
+        Watermarking is a central tool for provenance in generative models, yet its application to multivariate
+        time series remains hindered by reliability failures under post-editing attacks. We show that existing
+        detectors, which rely on globally coupled re-encoding, suffer from bidirectional drift of the null
+        distribution: post-editing attacks can shift the z-score of non-watermarked samples in either direction,
+        invalidating clean-calibrated thresholds. We argue that this instability is a property of the re-encoding,
+        and that reliable detection requires each recovered unit to depend only on a bounded temporal neighborhood.
+        Guided by this principle, we propose <b>L-VQVAE</b>, a generative model in which each discrete token is
+        produced from a short contiguous window, and <b>LVQMark</b>, a watermarking method over this token space
+        that combines logit-bias injection with robust re-encoding for attack-time detection. Experiments on four
+        benchmarks spanning finance, energy, and neuroimaging show that our approach preserves generation quality
+        while stabilizing both detection power and false-positive behavior under post-editing attacks.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <h2>Why Locality?</h2>
+      <div class="highlight-cards">
+        <div class="card">
+          <h3>Re-encoding stability</h3>
+          <p>We frame false-positive reliability as a re-encoding stability problem: when the detector's
+          re-encoding map is globally coupled, an attack shifts the null distribution of the statistic on
+          non-watermarked samples, so a clean-calibrated threshold stops meaning what it should.</p>
+        </div>
+        <div class="card">
+          <h3>Local VQ tokens</h3>
+          <p>L-VQVAE encodes each short sliding window into one codebook entry with a windowed cross-attention
+          tokenizer. A temporal edit can change at most the few tokens whose windows it overlaps, while the
+          global decoder and AR transformer stay free to model long-range structure.</p>
+        </div>
+        <div class="card">
+          <h3>Scheduled bias + robust re-encoding</h3>
+          <p>LVQMark adds a red&ndash;green logit bias with an alternating partition and an unbiased warm-up,
+          and a robust encoder maps attacked signals back to their clean token assignments for the
+          green-ratio test.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="container">
+      <h2>Bidirectional Null Drift in Existing Detectors</h2>
+      <div class="two-col">
+        <div class="figure">
+          <img src="static/images/null_drift_tokens.png" alt="Recovered green/red token assignments under crop and insert">
+        </div>
+        <div class="figure">
+          <img src="static/images/null_drift_zscore.png" alt="z-score distributions of non-watermarked samples">
+        </div>
+      </div>
+      <p class="caption"><b>Null drift on non-watermarked samples</b> (TimeWak, Stocks, length 128). Crop and
+      insert push the recovered tokens (left) and the resulting z-score (right) in opposite directions; insert
+      crosses the clean-calibrated threshold and yields an 85% false-positive rate. The drift direction is set
+      by the interaction between the re-encoding map and the attack, not by any watermark.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <h2>Watermark Scheduling</h2>
+      <div class="figure">
+        <img src="static/images/green_prob_etth.png" alt="Per-position green-token probability on ETTh">
+        <p class="caption"><b>Unbiased warm-up.</b> Per-position green-token probability on ETTh
+        (T&nbsp;=&nbsp;64, &delta;&nbsp;=&nbsp;10). Without the warm-up, the first positions are sampled
+        near-deterministically from the green set and form a stereotyped prefix. LVQMark suppresses the bias
+        for the first positions (shaded) and excludes them from the test, so early tokens follow the unbiased
+        autoregressive distribution.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="container">
+      <h2>Results</h2>
+      <div class="three-col">
+        <div class="figure">
+          <img src="static/images/etth_real.png" alt="Original ETTh samples">
+          <p class="sub">Original</p>
+        </div>
+        <div class="figure">
+          <img src="static/images/etth_wm.png" alt="Watermarked ETTh samples">
+          <p class="sub">Watermarked</p>
+        </div>
+        <div class="figure">
+          <img src="static/images/etth_nowm.png" alt="Non-watermarked ETTh samples">
+          <p class="sub">Non-watermarked</p>
+        </div>
+      </div>
+      <p class="caption"><b>Qualitative example.</b> Original and L-VQVAE-generated samples on ETTh
+      (length 64), with and without the LVQMark watermark.</p>
+
+      <div class="figure">
+        <img src="static/images/table.png" alt="Main watermark detection and quality results table">
+        <p class="caption"><b>Main results</b> (length 64, 30% attacks). TPR on watermarked samples, and
+        FPR with mean z-score on <i>attacked non-watermarked</i> samples under a detector calibrated at
+        0.1% FPR on clean negatives, together with Context-FID, Correlational, Discriminative and Predictive
+        scores. Best in bold, second best underlined; |z|&nbsp;&gt;&nbsp;3.09 in red.</p>
+      </div>
+
+      <div class="four-col">
+        <div class="figure"><img src="static/images/strength_stocks.png" alt="Stocks"><p class="sub">Stocks</p></div>
+        <div class="figure"><img src="static/images/strength_energy.png" alt="Energy"><p class="sub">Energy</p></div>
+        <div class="figure"><img src="static/images/strength_etth.png" alt="ETTh"><p class="sub">ETTh</p></div>
+        <div class="figure"><img src="static/images/strength_fmri.png" alt="fMRI"><p class="sub">fMRI</p></div>
+      </div>
+      <p class="caption"><b>Watermark strength.</b> z-score and Context-FID across the logit bias &delta;
+      for length 64; &delta;&nbsp;=&nbsp;0 is the non-watermarked baseline.</p>
+    </div>
+  </section>
+
+  <section id="BibTeX">
+    <div class="container narrow">
+      <h2>BibTeX</h2>
+      <div class="bibtex-wrap">
+        <button class="copy-btn" onclick="copyBib(this)">Copy</button>
+        <pre class="bibtex" id="bibtex-text">@inproceedings{kim2026locally,
+  title={A Locally Tokenized Generative Model for Robust Time-Series Watermarking},
+  author={Kim, Dongbin and Shin, Geonwoo and Choi, Yujin and Park, Soyeon and Lee, Jaewook},
+  booktitle={Advances in Neural Information Processing Systems},
+  volume={39},
+  year={2026}
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p class="container">Seoul National University · Nanyang Technological University · NeurIPS 2026<br>
+    Code released under the MIT License &mdash; <a href="https://github.com/dongbeank/LVQMark">github.com/dongbeank/LVQMark</a></p>
+  </footer>
+
+  <script>
+    function copyBib(btn) {
+      navigator.clipboard.writeText(document.getElementById('bibtex-text').textContent).then(function () {
+        btn.textContent = 'Copied!';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
+      });
+    }
+  </script>
+
+</body>
+</html>
