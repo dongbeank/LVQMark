@@ -98,9 +98,6 @@
 
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; align-items: center; margin-top: 1.6rem; }
     .two-col .figure { margin: 0; }
-    .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; align-items: start; margin-top: 1.6rem; }
-    .three-col .figure { margin: 0; }
-    .three-col .figure img { max-height: 520px; }
     .sub { font-size: 0.9rem; font-weight: 600; margin-top: 0.4rem; }
     .four-col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; align-items: start; margin-top: 1.6rem; }
     .four-col .figure { margin: 0; }
@@ -244,23 +241,6 @@
   <section class="band">
     <div class="container">
       <h2>Results</h2>
-      <div class="three-col">
-        <div class="figure">
-          <img src="static/images/etth_real.png" alt="Original ETTh samples">
-          <p class="sub">Original</p>
-        </div>
-        <div class="figure">
-          <img src="static/images/etth_wm.png" alt="Watermarked ETTh samples">
-          <p class="sub">Watermarked</p>
-        </div>
-        <div class="figure">
-          <img src="static/images/etth_nowm.png" alt="Non-watermarked ETTh samples">
-          <p class="sub">Non-watermarked</p>
-        </div>
-      </div>
-      <p class="caption"><b>Qualitative example.</b> Original and L-VQVAE-generated samples on ETTh
-      (length 64), with and without the LVQMark watermark.</p>
-
       <div class="figure">
         <img src="static/images/table.png" alt="Main watermark detection and quality results table">
         <p class="caption"><b>Main results</b> (length 64, 30% attacks). TPR on watermarked samples, and

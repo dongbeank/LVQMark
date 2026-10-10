@@ -22,14 +22,6 @@ LVQMark embeds a red–green logit bias during autoregressive sampling with a co
 
 ## Watermarking Results
 
-Original and L-VQVAE-generated ETTh samples (length 64), with and without the LVQMark watermark:
-
-<p>
-  <img src="docs/static/images/etth_real.png" width="30%">
-  <img src="docs/static/images/etth_wm.png" width="30%">
-  <img src="docs/static/images/etth_nowm.png" width="30%">
-</p>
-
 Watermark detection (TPR on watermarked samples; FPR and mean z-score on attacked non-watermarked samples) under 30% attacks, together with generation quality at length 64 (best in bold, second best underlined):
 
 <img src="docs/static/images/table.png">
