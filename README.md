@@ -1,8 +1,8 @@
-# LVQMark (NeurIPS 2026)
+# L-VQVAE & LVQMark (NeurIPS 2026)
 
-#### This repository is an official PyTorch implementation of L-VQVAE and LVQMark: [A Locally Tokenized Generative Model for Robust Time-Series Watermarking](https://openreview.net/forum?id=j0GmuP3V69) [[Project Page](https://dongbeank.github.io/LVQMark)]
+#### This repository is an official PyTorch implementation of L-VQVAE & LVQMark: [A Locally Tokenized Generative Model for Robust Time-Series Watermarking](https://openreview.net/forum?id=j0GmuP3V69) [[Project Page](https://dongbeank.github.io/LVQMark)]
 
-## Key Design of LVQMark
+## Key Design of L-VQVAE & LVQMark
 
 ![L-VQVAE and LVQMark overview](docs/static/images/framework.png)
 
