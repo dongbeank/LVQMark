@@ -103,7 +103,11 @@
     }
     .method-block .figure { margin-top: 0.8rem; }
     .method-block .figure img { max-height: 420px; }
-    .method-block .highlight-cards { margin-top: 1.2rem; }
+    .method-items { max-width: 820px; margin: 1.4rem auto 0; }
+    .method-items .item { margin-bottom: 1.3rem; }
+    .method-items .item:last-child { margin-bottom: 0; }
+    .method-items h4 { font-size: 1.02rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .method-items p { text-align: justify; }
 
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; align-items: center; margin-top: 1.6rem; }
     .two-col .figure { margin: 0; }
@@ -242,9 +246,9 @@
         <div class="figure">
           <img src="static/images/method_lvqvae.png" alt="L-VQVAE: local tokenizer, global decoder, autoregressive transformer">
         </div>
-        <div class="highlight-cards">
-          <div class="card">
-            <h3>(a) Local tokenizer</h3>
+        <div class="method-items">
+          <div class="item">
+            <h4>(a) Local tokenizer</h4>
             <p>The series is cut into overlapping windows of receptive field <i>R</i> and stride <i>s</i>.
             A shared cross-attention encoder with a single learnable query summarizes each window into one
             latent, which is snapped to its nearest entry of a shared codebook. Encoder and codebook are
@@ -252,14 +256,14 @@
             code fully describes its own window. A temporal edit can change at most the few tokens whose
             windows it overlaps.</p>
           </div>
-          <div class="card">
-            <h3>(b) Global decoder</h3>
+          <div class="item">
+            <h4>(b) Global decoder</h4>
             <p>Learnable time-step queries cross-attend to the embedded token sequence and a linear head emits
             the full series in one pass. It is trained with the encoder and codebook frozen. Since it is never
             run at detection time, it is free to model long-range structure without hurting robustness.</p>
           </div>
-          <div class="card">
-            <h3>(c) Autoregressive transformer</h3>
+          <div class="item">
+            <h4>(c) Autoregressive transformer</h4>
             <p>A decoder-only transformer models the token sequence with next-token cross-entropy, with causal
             attention restricted to a fixed lookback window. Sampling tokens and decoding them yields a
             synthetic series with no watermark.</p>
@@ -272,9 +276,9 @@
         <div class="figure">
           <img src="static/images/method_lvqmark.png" alt="LVQMark: scheduled logit-bias injection and robust detection via token re-encoding">
         </div>
-        <div class="highlight-cards">
-          <div class="card">
-            <h3>(d) Injection via scheduled logit bias</h3>
+        <div class="method-items">
+          <div class="item">
+            <h4>(d) Injection via scheduled logit bias</h4>
             <p>A secret seed splits the codebook into green and red halves, and a bias <i>&delta;</i> is added
             to the green logits before sampling. The partition is context-independent, so a re-encoding error
             at one position cannot propagate; it <b>alternates</b> with position parity, so runs of repeated
@@ -282,8 +286,8 @@
             positions unbiased (and excluded from the test), so near-uniform early logits do not lock in a
             stereotyped prefix.</p>
           </div>
-          <div class="card">
-            <h3>(e) Robust detection via token re-encoding</h3>
+          <div class="item">
+            <h4>(e) Robust detection via token re-encoding</h4>
             <p>A robust encoder shares the windowed cross-attention architecture but predicts a codebook index
             per window with a classifier. It is trained on clean/attacked pairs, with attacks drawn from a fixed
             family that includes the identity, to reproduce the tokens the frozen clean encoder assigns to the
