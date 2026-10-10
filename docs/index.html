@@ -96,6 +96,15 @@
     .card p { font-size: 0.92rem; color: var(--muted); }
     .card code, .prose code { font-size: 0.88em; background: rgba(36,86,214,0.08); padding: 0.08em 0.35em; border-radius: 4px; }
 
+    .method-block { margin-top: 2.2rem; }
+    .method-block > h3 {
+      font-family: "Castoro", Georgia, serif; font-weight: 400; font-size: 1.3rem;
+      text-align: center; margin-bottom: 0.2rem;
+    }
+    .method-block .figure { margin-top: 0.8rem; }
+    .method-block .figure img { max-height: 420px; }
+    .method-block .highlight-cards { margin-top: 1.2rem; }
+
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; align-items: center; margin-top: 1.6rem; }
     .two-col .figure { margin: 0; }
     .sub { font-size: 0.9rem; font-weight: 600; margin-top: 0.4rem; }
@@ -226,6 +235,68 @@
 
   <section>
     <div class="container">
+      <h2>Method</h2>
+
+      <div class="method-block">
+        <h3>L-VQVAE: a locally tokenized generative model</h3>
+        <div class="figure">
+          <img src="static/images/method_lvqvae.png" alt="L-VQVAE: local tokenizer, global decoder, autoregressive transformer">
+        </div>
+        <div class="highlight-cards">
+          <div class="card">
+            <h3>(a) Local tokenizer</h3>
+            <p>The series is cut into overlapping windows of receptive field <i>R</i> and stride <i>s</i>.
+            A shared cross-attention encoder with a single learnable query summarizes each window into one
+            latent, which is snapped to its nearest entry of a shared codebook. Encoder and codebook are
+            pretrained with a <i>local</i> decoder that must rebuild the window from its single code, so every
+            code fully describes its own window. A temporal edit can change at most the few tokens whose
+            windows it overlaps.</p>
+          </div>
+          <div class="card">
+            <h3>(b) Global decoder</h3>
+            <p>Learnable time-step queries cross-attend to the embedded token sequence and a linear head emits
+            the full series in one pass. It is trained with the encoder and codebook frozen. Since it is never
+            run at detection time, it is free to model long-range structure without hurting robustness.</p>
+          </div>
+          <div class="card">
+            <h3>(c) Autoregressive transformer</h3>
+            <p>A decoder-only transformer models the token sequence with next-token cross-entropy, with causal
+            attention restricted to a fixed lookback window. Sampling tokens and decoding them yields a
+            synthetic series with no watermark.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="method-block">
+        <h3>LVQMark: watermarking over local VQ tokens</h3>
+        <div class="figure">
+          <img src="static/images/method_lvqmark.png" alt="LVQMark: scheduled logit-bias injection and robust detection via token re-encoding">
+        </div>
+        <div class="highlight-cards">
+          <div class="card">
+            <h3>(d) Injection via scheduled logit bias</h3>
+            <p>A secret seed splits the codebook into green and red halves, and a bias <i>&delta;</i> is added
+            to the green logits before sampling. The partition is context-independent, so a re-encoding error
+            at one position cannot propagate; it <b>alternates</b> with position parity, so runs of repeated
+            tokens cannot saturate the green ratio; and an <b>unbiased warm-up</b> leaves the first <i>m</i>
+            positions unbiased (and excluded from the test), so near-uniform early logits do not lock in a
+            stereotyped prefix.</p>
+          </div>
+          <div class="card">
+            <h3>(e) Robust detection via token re-encoding</h3>
+            <p>A robust encoder shares the windowed cross-attention architecture but predicts a codebook index
+            per window with a classifier. It is trained on clean/attacked pairs, with attacks drawn from a fixed
+            family that includes the identity, to reproduce the tokens the frozen clean encoder assigns to the
+            clean input. At detection it replaces the clean encoder; the green sets are rebuilt from the seed
+            and the green-ratio z-score is tested against a clean-calibrated threshold.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="container">
       <h2>Watermark Scheduling</h2>
       <div class="figure">
         <img src="static/images/green_prob_etth.png" alt="Per-position green-token probability on ETTh">
@@ -238,7 +309,7 @@
     </div>
   </section>
 
-  <section class="band">
+  <section>
     <div class="container">
       <h2>Results</h2>
       <div class="figure">
@@ -260,7 +331,7 @@
     </div>
   </section>
 
-  <section id="BibTeX">
+  <section class="band" id="BibTeX">
     <div class="container narrow">
       <h2>BibTeX</h2>
       <div class="bibtex-wrap">
